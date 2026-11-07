@@ -51,16 +51,17 @@
 ```bash
 git clone https://github.com/tom61-bl/expression-explorer.git
 cd expression-explorer
-# 直接打开
-start index.html      # Windows
-open index.html       # macOS
 ```
+
+然后直接双击 `index.html`（Windows 也可以 `start index.html`，macOS 用 `open index.html`）。
 
 也可以用任意静态服务器：
 
 ```bash
 python -m http.server 8000
 ```
+
+浏览器打开 `http://localhost:8000`。
 
 ## 部署
 
