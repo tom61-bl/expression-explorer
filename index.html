@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>表达力探索 · Expression Explorer</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>◈</text></svg>">
+<style>
+:root{
+  --paper:#f6f4ef; --ink:#1a1f2e; --soft:#3a4252; --muted:#7a8290;
+  --line:#dcd8ce; --card:#fffdf8;
+  --navy:#1e3a5f; --terra:#b85c2a; --forest:#3a6b5c; --accent:#1e3a5f;
+  --danger:#c0504a; --success:#4a9e6a; --warn:#c99a3f;
+  --mono:ui-monospace,"SF Mono","Cascadia Mono",Consolas,"Courier New",monospace;
+  --sans:"PingFang SC","Microsoft YaHei","Hiragino Sans GB",system-ui,sans-serif;
+}
+body.dark{
+  --paper:#14171f; --ink:#e8eaf0; --soft:#c4c9d4; --muted:#8891a0;
+  --line:#2a3040; --card:#1c212c;
+  --navy:#6f9bd8; --terra:#d98a5c; --forest:#6fa58f;
+  --danger:#e07870; --success:#6bc48e; --warn:#dcb46a;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:15px;
+  line-height:1.7;-webkit-font-smoothing:antialiased;transition:background .3s,color .3s}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+.hidden{display:none!important}
+.svgic{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;
+  stroke-linecap:round;stroke-linejoin:round}
+
+/* 顶栏 */
+.topbar{height:58px;display:flex;align-items:center;gap:16px;padding:0 20px;
+  border-bottom:1px solid var(--line);background:var(--paper);position:sticky;top:0;z-index:20}
+.brand{font-weight:700;font-size:16px}
+.brand small{font-family:var(--mono);font-size:9.5px;color:var(--muted);font-weight:400;
+  letter-spacing:.14em;display:block;text-transform:uppercase}
+.modepick{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.modepick button{padding:7px 18px;font-size:13.5px;color:var(--soft);display:flex;gap:7px;align-items:center}
+.modepick button.sel{background:var(--accent);color:#fff}
+.topbar .spacer{flex:1}
+.miniprogress{display:flex;align-items:center;gap:9px;font-family:var(--mono);font-size:11px;color:var(--muted)}
+.minibar{width:110px;height:4px;background:var(--line);border-radius:2px;overflow:hidden}
+.minibar i{display:block;height:100%;background:var(--accent);transition:width .4s}
+.iconbtn{width:36px;height:36px;border:1px solid var(--line);border-radius:8px;display:inline-flex;
+  align-items:center;justify-content:center;color:var(--soft)}
+.iconbtn:hover{border-color:var(--accent);color:var(--accent)}
+
+/* A 学习布局 */
+#modeA{display:grid;grid-template-columns:250px 1fr;height:calc(100vh - 58px)}
+.sidebar{border-right:1px solid var(--line);overflow-y:auto;padding:14px 12px}
+.search{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--card);
+  color:var(--ink);font-family:inherit;font-size:13px;margin-bottom:14px}
+.search:focus{outline:none;border-color:var(--accent)}
+.group{margin-bottom:15px}
+.group>b{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;color:var(--muted);
+  display:flex;justify-content:space-between;padding:0 6px;margin-bottom:6px;text-transform:uppercase}
+.lesson{display:flex;align-items:center;gap:9px;width:100%;text-align:left;padding:8px;border-radius:8px;font-size:13.5px}
+.lesson:hover{background:var(--card)}
+.lesson.active{background:var(--card);box-shadow:inset 2px 0 0 var(--accent)}
+.ldot{width:7px;height:7px;border-radius:50%;background:var(--muted);flex:none}
+.lesson.active .ldot{background:var(--accent)}
+.lesson .lt{flex:1}
+.lesson small{font-family:var(--mono);font-size:9px;color:var(--muted);display:block;letter-spacing:.08em}
+.main{overflow-y:auto;padding:22px 26px;display:flex;flex-direction:column;gap:18px}
+.head{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:10px}
+.head h1{font-size:26px}
+.head .en{font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase}
+.seg{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{padding:7px 16px;font-size:13px;color:var(--soft)}
+.seg button.sel{background:var(--accent);color:#fff}
+.stage{position:relative;border:1px solid var(--line);border-radius:12px;background:var(--card);
+  padding:24px 20px 18px;min-height:228px}
+.stage .cap{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.12em;
+  text-transform:uppercase;margin-bottom:16px}
+.nodes{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;position:relative;z-index:2}
+.node{border:1px solid var(--line);border-radius:10px;padding:12px 8px;text-align:center;background:var(--paper)}
+.node b{display:block;font-size:14px}
+.node small{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:.06em}
+.stage svg.lines{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none}
+.traveldot{fill:var(--accent);filter:drop-shadow(0 0 5px var(--accent))}
+.ctrl{display:flex;align-items:center;gap:10px}
+.ctrl .info{flex:1}
+.ctrl .stepname{font-weight:600}
+.ctrl .stepdesc{color:var(--muted);font-size:13px}
+.pill{font-family:var(--mono);font-size:11px;padding:5px 10px;border:1px solid var(--line);border-radius:7px;color:var(--soft)}
+.trace{width:100%;border-collapse:collapse;font-size:13px}
+.trace th{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--muted);text-align:left;
+  padding:8px 10px;border-bottom:1px solid var(--line);text-transform:uppercase}
+.trace td{padding:9px 10px;border-bottom:1px solid var(--line);color:var(--soft)}
+.trace tr.cur td{background:var(--card);color:var(--ink)}
+.trace tr.cur td:first-child{box-shadow:inset 2px 0 0 var(--accent)}
+.trace .no{font-family:var(--mono);color:var(--muted)}
+.gotrain{margin-top:4px}
+.gotrain button{display:inline-flex;gap:8px;align-items:center;color:var(--accent);font-size:13.5px;font-weight:600}
+.casebox{border:1px solid var(--line);border-radius:12px;background:var(--card);padding:22px}
+.casebox .ctx{font-family:var(--mono);font-size:10.5px;color:var(--muted);letter-spacing:.1em;
+  text-transform:uppercase;margin-bottom:16px}
+.casegrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.persona{border-radius:10px;padding:16px;border:1px solid var(--line)}
+.persona.junior{border-left:4px solid var(--danger)}
+.persona.senior{border-left:4px solid var(--success)}
+.persona .who{font-weight:700;font-size:14px;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.persona .who small{font-family:var(--mono);font-size:10px;color:var(--muted);font-weight:400}
+.persona .say{font-size:14px;line-height:1.75;margin-bottom:10px}
+.persona .pnote{font-size:12.5px;color:var(--muted)}
+.casediff{margin-top:16px;padding-top:14px;border-top:1px dashed var(--line);font-size:13.5px;color:var(--soft)}
+.casediff b{color:var(--accent)}
+
+/* B 训练布局 */
+#modeB{height:calc(100vh - 58px);overflow-y:auto}
+.bwrap{max-width:920px;margin:0 auto;padding:28px 26px 60px}
+.bh{margin-bottom:20px}
+.bh h2{font-size:24px}
+.bh p{color:var(--muted);font-size:14px;margin-top:4px}
+.entrypick{display:flex;gap:8px;margin-bottom:16px}
+.entrypick button{padding:8px 18px;border:1px solid var(--line);border-radius:8px;font-size:13.5px;color:var(--soft)}
+.entrypick button.sel{border-color:var(--accent);color:var(--accent)}
+.catpick{display:flex;gap:7px;margin-bottom:12px;flex-wrap:wrap}
+.catpick button{padding:6px 13px;border:1px solid var(--line);border-radius:7px;font-size:12.5px;color:var(--soft)}
+.catpick button.sel{background:var(--accent);color:#fff;border-color:var(--accent)}
+.qpick{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--card);
+  color:var(--ink);font-family:inherit;font-size:14px;margin-bottom:14px}
+.rawbox{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--warn);border-radius:10px;
+  padding:16px 18px;font-size:13.5px;color:var(--soft);margin-bottom:14px;white-space:pre-wrap}
+.rawbox .rt{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.1em;
+  text-transform:uppercase;display:block;margin-bottom:8px}
+textarea{width:100%;min-height:210px;background:var(--card);border:1px solid var(--line);border-radius:10px;
+  padding:16px;font-family:var(--sans);font-size:15px;line-height:1.8;color:var(--ink);resize:vertical}
+textarea:focus{outline:none;border-color:var(--accent)}
+.btnrow{display:flex;gap:12px;margin-top:16px;flex-wrap:wrap}
+.btnprimary{background:var(--accent);color:#fff;padding:12px 30px;border-radius:10px;font-size:15px;font-weight:600}
+.btnprimary:hover{opacity:.9}
+.btnghost{padding:12px 24px;border:1px solid var(--line);border-radius:10px;font-size:15px;color:var(--soft)}
+/* 结果 */
+.result{margin-top:26px;display:flex;flex-direction:column;gap:20px}
+.scorecard{display:flex;gap:34px;align-items:center;flex-wrap:wrap;background:var(--card);
+  border:1px solid var(--line);border-radius:14px;padding:26px}
+.ring{position:relative;width:130px;height:130px;flex:none}
+.ring svg{transform:rotate(-90deg)}
+.ring .num{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring .num b{font-family:var(--mono);font-size:34px}
+.ring .num small{font-size:11px;color:var(--muted)}
+.dimbars{flex:1;min-width:240px;display:flex;flex-direction:column;gap:12px}
+.dimbar{display:flex;align-items:center;gap:12px}
+.dimbar .dl{width:96px;font-size:13px;color:var(--soft);flex:none}
+.dimbar .dc{flex:1;height:9px;background:var(--line);border-radius:5px;overflow:hidden}
+.dimbar .df{height:100%;border-radius:5px}
+.dimbar .ds{width:40px;text-align:right;font-family:var(--mono);font-size:12px}
+.fblist{display:flex;flex-direction:column;gap:12px}
+.fb{border-radius:10px;padding:16px 18px;display:flex;gap:14px;align-items:flex-start}
+.fb.pass{background:color-mix(in srgb,var(--success) 12%,transparent);border-left:4px solid var(--success)}
+.fb.fail{background:color-mix(in srgb,var(--danger) 12%,transparent);border-left:4px solid var(--danger)}
+.fb .fi{width:26px;height:26px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:13px;font-weight:700}
+.fb.pass .fi{background:var(--success)} .fb.fail .fi{background:var(--danger)}
+.fb .ftitle{font-weight:600;font-size:14.5px;margin-bottom:2px}
+.fb .ftext{font-size:13.5px;color:var(--soft)}
+.fb .fsug{font-size:13px;color:var(--accent);margin-top:8px;padding-top:8px;border-top:1px dashed var(--line)}
+.compare{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px}
+.compare h3,.perfect h3{font-size:16px;margin-bottom:14px}
+.cmpitem{border-radius:10px;padding:14px 16px;margin-bottom:10px;font-size:13.5px}
+.cmpitem.good{border-left:4px solid var(--success);background:color-mix(in srgb,var(--success) 9%,transparent)}
+.cmpitem.bad{border-left:4px solid var(--danger);background:color-mix(in srgb,var(--danger) 9%,transparent)}
+.cmpitem .tag{display:inline-block;padding:2px 8px;border-radius:5px;color:#fff;font-size:11px;margin-bottom:6px}
+.cmpitem.good .tag{background:var(--success)} .cmpitem.bad .tag{background:var(--danger)}
+.perfect{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px}
+.pyr{display:flex;flex-direction:column;align-items:center;gap:14px}
+.pyr .pconc{background:var(--accent);color:#fff;border-radius:12px;padding:16px 24px;width:100%;text-align:center}
+.pyr .ppoints{width:100%;display:flex;flex-direction:column;gap:10px}
+.ppoint{border:1px solid var(--accent);border-radius:10px;padding:12px 16px}
+.ppoint b{font-size:14px} .ppoint span{display:block;font-size:13px;color:var(--muted);margin-top:3px}
+@media(max-width:780px){
+  #modeA{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .nodes{grid-template-columns:repeat(2,1fr)}
+  .casegrid{grid-template-columns:1fr}
+  .modepick button{padding:7px 12px}
+  .minibar{display:none}
+}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">表达力探索<small>Expression Explorer</small></div>
+  <div class="modepick">
+    <button id="m-A" class="sel">学习</button>
+    <button id="m-B">训练</button>
+  </div>
+  <div class="spacer"></div>
+  <div class="miniprogress">
+    <span id="mp-text">1 / 10</span>
+    <div class="minibar"><i id="mp-fill"></i></div>
+  </div>
+  <button class="iconbtn" id="themebtn">
+    <svg class="svgic" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3 7 7 0 0 0 21 12.8z"/></svg>
+  </button>
+</header>
+
+<!-- ===== 模式 A：学习 ===== -->
+<section id="modeA">
+  <aside class="sidebar">
+    <input class="search" id="navsearch" placeholder="搜索课程 / 关键词…">
+    <div id="nav"></div>
+  </aside>
+  <div class="main">
+    <div class="head">
+      <div>
+        <h1 id="title"></h1>
+        <div class="en" id="en"></div>
+      </div>
+      <div class="seg">
+        <button id="sc-plain">普通说法</button>
+        <button id="sc-better">更好说法</button>
+      </div>
+    </div>
+    <div class="stage">
+      <div class="cap" id="scenecap"></div>
+      <svg class="lines" id="lines" preserveAspectRatio="none" viewBox="0 0 100 100"></svg>
+      <div class="nodes" id="nodes"></div>
+    </div>
+    <div class="ctrl">
+      <button class="iconbtn" id="playbtn">
+        <svg class="svgic" viewBox="0 0 24 24" id="playic"><path d="M7 5v14l11-7z"/></svg>
+      </button>
+      <button class="iconbtn" id="resetbtn">
+        <svg class="svgic" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7M3 4v5h5"/></svg>
+      </button>
+      <span class="pill" id="speedtxt">1×</span>
+      <div class="info">
+        <div class="stepname" id="stepname"></div>
+        <div class="stepdesc" id="stepdesc"></div>
+      </div>
+    </div>
+    <table class="trace">
+      <thead><tr><th style="width:46px">#</th><th style="width:36%">本步</th><th>状态观察</th></tr></thead>
+      <tbody id="tracebody"></tbody>
+    </table>
+    <div class="casebox" id="casebox"></div>
+    <div class="gotrain"><button id="gotrain">去练这一课 →</button></div>
+  </div>
+</section>
+
+<!-- ===== 模式 B：训练 ===== -->
+<section id="modeB" class="hidden">
+  <div class="bwrap">
+    <div class="bh">
+      <h2>训练工坊</h2>
+      <p>把你想说的话写下来，系统按四个维度打分，并给出可执行的改写建议。</p>
+    </div>
+    <div class="entrypick">
+      <button id="en-bank" class="sel">题库练习</button>
+      <button id="en-free">我的表达</button>
+    </div>
+    <div id="bankpart">
+      <div class="catpick" id="catpick"></div>
+      <select class="qpick" id="qselect"></select>
+      <div class="rawbox" id="rawbox"></div>
+    </div>
+    <textarea id="usertext" placeholder="在这里写下你的表达…（题库模式下请把上面的原始信息重组成金字塔结构）"></textarea>
+    <div class="btnrow">
+      <button class="btnprimary" id="analyzebtn">提交评分</button>
+      <button class="btnghost" id="clearbtn">清空重写</button>
+    </div>
+    <div class="result" id="result"></div>
+  </div>
+</section>
+
+<script>
+/* ================= 数据：10 课 ================= */
+const GROUPS=[
+  {id:'g0',name:'结构',color:'#1e3a5f'},
+  {id:'g1',name:'增量与语气',color:'#b85c2a'},
+  {id:'g2',name:'场景',color:'#3a6b5c'}
+];
+const LESSONS=[
+ {id:'conclusion-first',group:'g0',title:'结论先行',en:'Conclusion First',
+  better:{cap:'更好说法 · 30 秒内先给答案',steps:[
+   {name:'开口先给结论',obs:'第一句就把判断/建议抛出，对方立刻知道你要他做什么'},
+   {name:'再给三个支撑点',obs:'每个点一句话，彼此独立、不重叠'},
+   {name:'用数据补强',obs:'关键论点配一个数字或事实，可信度立刻上来'},
+   {name:'收尾确认行动',obs:'明确下一步谁做什么，闭环'}]},
+  plain:{cap:'普通说法 · 铺垫半天才到重点',steps:[
+   {name:'先讲背景',obs:'从“是这样的”开始，对方还不知道你要干嘛'},
+   {name:'再讲过程细节',obs:'按时间顺序堆流水账，重点淹没在细节里'},
+   {name:'中途插新情况',obs:'想到哪说到哪，逻辑线被打断'},
+   {name:'最后才说结论',obs:'听到这里对方可能已经走神，重点没接住'}]}},
+ {id:'pyramid-mece',group:'g0',title:'金字塔与 MECE',en:'Pyramid & MECE',
+  better:{cap:'更好说法 · 先塔尖后塔基',steps:[
+   {name:'塔尖放中心思想',obs:'一句话概括全部，下面都是它的支撑'},
+   {name:'分 2-4 组论点',obs:'同层之间相互独立、完全穷尽（MECE）'},
+   {name:'每组下挂证据',obs:'论点在上、事实在下，层次分明'},
+   {name:'检查有无重叠',obs:'确认没有一个点被讲两遍'}]},
+  plain:{cap:'普通说法 · 论点交叉',steps:[
+   {name:'直接罗列要点',obs:'没有中心思想统摄，要点像散落的珠子'},
+   {name:'论点互相包含',obs:'A 点和 B 点讲了同一件事，显得啰嗦'},
+   {name:'维度混在一起',obs:'有的讲原因、有的讲对策，层级混乱'},
+   {name:'漏掉关键方面',obs:'没有 MECE 检查，重要类别被遗漏'}]}},
+ {id:'scqa-prep',group:'g0',title:'SCQA 与 PREP',en:'SCQA & PREP',
+  better:{cap:'更好说法 · 有开场有结构',steps:[
+   {name:'S 情境引入',obs:'用对方熟悉的背景建立共鸣'},
+   {name:'C 冲突制造张力',obs:'点出矛盾，让人想知道答案'},
+   {name:'Q 抛出问题',obs:'自然引出你要回答的核心问题'},
+   {name:'A 给出答案',obs:'再用 PREP（观点-理由-例子-观点）展开'}]},
+  plain:{cap:'普通说法 · 平铺开场',steps:[
+   {name:'直接讲方案',obs:'对方还没进入情境，get 不到为什么重要'},
+   {name:'没有冲突',obs:'平铺直叙，缺少让人听下去的张力'},
+   {name:'结构松散',obs:'观点和例子穿插，抓不住主线'},
+   {name:'结尾不回扣',obs:'讲完没有重申观点，记忆点弱'}]}},
+ {id:'increment',group:'g1',title:'信息增量',en:'Information Increment',
+  better:{cap:'更好说法 · 每句都有新信息',steps:[
+   {name:'先问对方知道吗',obs:'已知的信息一句带过，不重复'},
+   {name:'只讲增量部分',obs:'聚焦对方不知道的新事实、新判断'},
+   {name:'删掉正确废话',obs:'“要重视”“要加强”这类无信息量的话删掉'},
+   {name:'给出明确指向',obs:'每条都落到具体动作或结论'}]},
+  plain:{cap:'普通说法 · 正确废话连篇',steps:[
+   {name:'复述对方已知',obs:'大段背景对方早就清楚，浪费时间'},
+   {name:'讲空泛原则',obs:'“要高度重视”却不说怎么重视'},
+   {name:'同义反复',obs:'换个说法重复同一件事，没有新增'},
+   {name:'听完不知道做啥',obs:'信息密度太低，没有可执行点'}]}},
+ {id:'specific',group:'g1',title:'具体化',en:'Be Specific',
+  better:{cap:'更好说法 · 下梯子到事实',steps:[
+   {name:'下抽象梯子',obs:'把“效果不好”换成具体哪里不好'},
+   {name:'加数字',obs:'“很快”→“3 天内”，“很多”→“12 个”'},
+   {name:'给可感知细节',obs:'用一个具体场景让人“看见”'},
+   {name:'用围栏界定范围',obs:'说清适用边界，避免绝对化'}]},
+  plain:{cap:'普通说法 · 抽象笼统',steps:[
+   {name:'停在抽象概念',obs:'“体验不佳”“效率不高”，无法验证'},
+   {name:'没有量化',obs:'全是“大概”“可能”，可信度低'},
+   {name:'缺乏画面感',obs:'对方无法在脑中形成具体印象'},
+   {name:'边界模糊',obs:'一刀切的表述，容易被反例推翻'}]}},
+ {id:'certainty',group:'g1',title:'确定感',en:'Sense of Certainty',
+  better:{cap:'更好说法 · 干净利落',steps:[
+   {name:'去掉口头禅',obs:'“嗯”“那个”“可能吧”全部清除'},
+   {name:'动词优先',obs:'用主动、明确的动词替代名词化表达'},
+   {name:'语气三参数到位',obs:'音量、语速、停顿有意识地控制'},
+   {name:'给确定判断',obs:'该下结论时不含糊'}]},
+  plain:{cap:'普通说法 · 犹豫迟疑',steps:[
+   {name:'口头禅密集',obs:'“我觉得吧”“就是”削弱专业感'},
+   {name:'被动绕弯',obs:'名词化、被动句，动作主体不清'},
+   {name:'语速失控',obs:'紧张时越说越快，重点被带过'},
+   {name:'判断含糊',obs:'“也许大概”让对方不敢信任'}]}},
+ {id:'report',group:'g2',title:'汇报与布置',en:'Reporting & Delegating',
+  better:{cap:'更好说法 · 结论+风险+请求',steps:[
+   {name:'汇报先给结论',obs:'结果先行，再讲原因和过程'},
+   {name:'坏消息带方案',obs:'不只报问题，同时给出 2 个对策'},
+   {name:'布置讲清五要素',obs:'任务、标准、期限、资源、验收一次说清'},
+   {name:'确认对方复述',obs:'让对方回述一遍，确保理解一致'}]},
+  plain:{cap:'普通说法 · 只带问题',steps:[
+   {name:'汇报先讲过程',obs:'领导听半天还不知道结果'},
+   {name:'坏消息只报忧',obs:'抛出问题却没有方案，等领导拍板'},
+   {name:'布置只说去做',obs:'没讲标准和期限，下属只能猜'},
+   {name:'不做确认',obs:'理解偏差到交付时才暴露'}]}},
+ {id:'interview-speech',group:'g2',title:'面试与演讲',en:'Interview & Speech',
+  better:{cap:'更好说法 · 有框架有承诺',steps:[
+   {name:'用 STAR 讲案例',obs:'情境-任务-行动-结果，完整可信'},
+   {name:'开场给赋能承诺',obs:'一句话告诉听众“你能带走什么”'},
+   {name:'主体三点结构',obs:'只讲三个重点，方便记忆'},
+   {name:'结尾号召行动',obs:'用一个明确呼吁收束'}]},
+  plain:{cap:'普通说法 · 流水账',steps:[
+   {name:'案例只讲做了啥',obs:'没有任务和结果，体现不出价值'},
+   {name:'开场自报家门',obs:'没说听众收益，抓不住注意力'},
+   {name:'要点太多',obs:'信息过载，观众一个都记不住'},
+   {name:'结尾草草收场',obs:'没有行动号召，听完就散'}]}},
+ {id:'tough-talk',group:'g2',title:'难谈对话',en:'Tough Conversations',
+  better:{cap:'更好说法 · 对事不对人',steps:[
+   {name:'SBI 描述行为',obs:'情境-行为-影响，只说事实不贴标签'},
+   {name:'STATE 讲事实',obs:'先讲事实再讲感受，不评判动机'},
+   {name:'OFNR 表达需求',obs:'观察-感受-需要-请求，非暴力沟通'},
+   {name:'邀请对方回应',obs:'留出对话空间，共同找方案'}]},
+  plain:{cap:'普通说法 · 情绪对抗',steps:[
+   {name:'直接下评判',obs:'“你总是不负责”，对方立刻防御'},
+   {name:'揣测动机',obs:'“你就是故意的”，引发对立'},
+   {name:'翻旧账',obs:'把过去的事一起搬出来，冲突升级'},
+   {name:'单向输出',obs:'不给对方说话机会，谈崩收场'}]}},
+ {id:'listen-humor',group:'g2',title:'倾听提问与幽默',en:'Listening & Humor',
+  better:{cap:'更好说法 · 先听懂再开口',steps:[
+   {name:'共情倾听',obs:'先回应情绪，再回应内容'},
+   {name:'确认理解',obs:'用“你的意思是…”复述确认'},
+   {name:'提开放式好问题',obs:'用“怎么/为什么”引导对方深入'},
+   {name:'幽默有分寸',obs:'自嘲而非取笑，点到为止'}]},
+  plain:{cap:'普通说法 · 急着回应',steps:[
+   {name:'打断对方',obs:'没听完就急着给建议'},
+   {name:'自说自话',obs:'不确认对方真正想表达什么'},
+   {name:'封闭式提问',obs:'“是不是”把天聊死'},
+   {name:'幽默越界',obs:'拿对方痛点开玩笑，反而伤人'}]}}
+];
+
+/* ================= 案例：高管 vs 应届生 ================= */
+const CASES={
+ 'conclusion-first':{
+  context:'同一情境：向领导汇报项目能否按时上线',
+  junior:{who:'应届生',say:'领导，客户上周又改了需求，测试那边也说人手不够，我问了几个同事，他们都在忙别的项目……',note:'先讲过程，结论要领导自己猜'},
+  senior:{who:'高管',say:'项目会延期 3 天，主要卡在测试资源，我建议从 B 组借两人，下周五就能交付。',note:'第一句就给判断＋方案＋时间'},
+  diff:'差距不在词汇，而在顺序：高管把结论和对策放最前，应届生把过程放最前。'},
+ 'pyramid-mece':{
+  context:'同一情境：解释本季度销量为什么下滑',
+  junior:{who:'应届生',say:'可能是对手降价了，也可能是我们推广不够，还有产品也有点问题，对手好像确实在打折……',note:'原因重复又漏项，维度混乱'},
+  senior:{who:'高管',say:'原因分两类：外部是对手降价和季节淡季，内部是新品断货和渠道收缩，两类互不重叠。',note:'先归类再展开，MECE 不重不漏'},
+  diff:'高管把零散原因归成几个互斥的类别，应届生把原因平铺、彼此交叉。'},
+ 'scqa-prep':{
+  context:'同一情境：在会上提一个新方案',
+  junior:{who:'应届生',say:'我想做个会员系统，功能大概是积分、等级，还有优惠券，我先讲一下数据库……',note:'直接进细节，没人知道为什么要做'},
+  senior:{who:'高管',say:'我们复购率连续两季走低（情境），而老客户正流向对手（冲突），怎么把人留住？（问题）答案是上线会员体系。',note:'用 SCQA 先建立张力再给答案'},
+  diff:'高管先让听众感到“这事非解决不可”，应届生默认大家已经关心这个方案。'},
+ 'increment':{
+  context:'同一情境：周会上同步项目进展',
+  junior:{who:'应届生',say:'这个项目是上个月立项的，目标是提升转化，我们组一共五个人，目前在做第一期，大家都很努力……',note:'全是领导已知的背景和正确废话'},
+  senior:{who:'高管',say:'本周新增两件事：首页改版已上线、转化提升 2 个点；需要您拍板下周的预算追加。',note:'只讲增量和待决策项'},
+  diff:'高管默认对方时间宝贵、只递新信息，应届生用已知信息填满时间。'},
+ 'specific':{
+  context:'同一情境：描述一批用户正在流失',
+  junior:{who:'应届生',say:'最近用户反馈不太好，流失的人挺多的，体验上可能有点问题。',note:'抽象、无法验证，也无法行动'},
+  senior:{who:'高管',say:'近 30 天流失率从 5% 升到 8%，其中 70% 卡在注册第二步的验证码。',note:'下梯子到数字和具体环节'},
+  diff:'高管把“不好”变成可量化、可定位的事实，应届生停在形容词。'},
+ 'certainty':{
+  context:'同一情境：被问什么时候能交付',
+  junior:{who:'应届生',say:'那个，我尽量吧，可能差不多下周，应该不会太久。',note:'口头禅＋含糊，让人不敢托付'},
+  senior:{who:'高管',say:'我周三下午 6 点前交付，先发初稿、周五给终稿。',note:'明确动词＋时间点，确定感强'},
+  diff:'高管用确定的时间和动作建立信任，应届生用“尽量、可能”稀释承诺。'},
+ 'report':{
+  context:'同一情境：向领导报告一个大客户可能解约',
+  junior:{who:'应届生',say:'领导，不好了，那个客户好像要解约，我也没办法，您看怎么办？',note:'只报问题、不带方案，上交焦虑'},
+  senior:{who:'高管',say:'客户有解约风险，原因是交付晚了一周。我准备了两个对策：折扣续约或免费升级，建议今天先约对方。',note:'坏消息配两个可选方案'},
+  diff:'高管让领导做选择题，应届生让领导做问答题。'},
+ 'interview-speech':{
+  context:'同一情境：面试中讲一段自己做过的项目',
+  junior:{who:'应届生',say:'我在实习时做过一个活动，就是写文案、联系同学，还做了海报，挺忙的。',note:'流水账，没有任务和结果'},
+  senior:{who:'高管',say:'当时要解决报名不足（任务），我重新设计了宣传路径（行动），最终报名人数翻了一倍、成本降了 20%（结果）。',note:'用 STAR 突出可量化结果'},
+  diff:'高管讲“我带来了什么结果”，应届生只讲“我做了什么动作”。'},
+ 'tough-talk':{
+  context:'同一情境：需要指出同事反复拖延的问题',
+  junior:{who:'应届生',say:'你怎么总是不配合啊，每次都拖后腿，能不能上点心？',note:'贴标签、指责动机，对方立刻防御'},
+  senior:{who:'高管',say:'这周三的报告你晚交了两天（事实），导致团队评审顺延（影响），下次能否提前一天同步风险？',note:'用 SBI 只说行为和影响'},
+  diff:'高管对事不对人、给可执行请求，应届生直接评判人，容易谈崩。'},
+ 'listen-humor':{
+  context:'同一情境：朋友来倾诉工作不顺',
+  junior:{who:'应届生',say:'这有什么，我跟你说我上次更惨，你就是想太多了。',note:'打断、比惨、贴标签，情绪没被接住'},
+  senior:{who:'高管',say:'听起来你是觉得付出没被看见，挺委屈的，具体是哪件事让你最难受？',note:'先共情复述，再提开放问题'},
+  diff:'高管先处理情绪再处理问题，应届生急着给判断和讲自己。'}
+};
+
+/* ================= 状态与本地存储 ================= */
+const store={
+  get(k,d){try{return JSON.parse(localStorage.getItem('expr_'+k))??d}catch(e){return d}},
+  set(k,v){try{localStorage.setItem('expr_'+k,JSON.stringify(v))}catch(e){}}
+};
+let state={mode:store.get('mode','A'),lesson:store.get('lesson','conclusion-first'),
+  scene:store.get('scene','plain'),step:0,playing:false,timer:null,speed:1,
+  entry:store.get('entry','bank'),bankcat:store.get('bankcat','业务汇报')};
+
+/* ================= A 学习模式 ================= */
+function curLesson(){return LESSONS.find(l=>l.id===state.lesson)||LESSONS[0]}
+function renderNav(){
+  const q=(document.getElementById('navsearch').value||'').toLowerCase();
+  document.getElementById('nav').innerHTML=GROUPS.map(g=>{
+    const ls=LESSONS.filter(l=>l.group===g.id&&(!q||l.title.toLowerCase().includes(q)||l.en.toLowerCase().includes(q)));
+    if(!ls.length)return '';
+    return `<div class="group"><b><span>${g.name}</span><span>${ls.length}</span></b>`+
+      ls.map(l=>`<button class="lesson ${l.id===state.lesson?'active':''}" data-id="${l.id}">
+        <span class="ldot" style="background:${g.color}"></span>
+        <span class="lt">${l.title}<small>${l.en}</small></span></button>`).join('')+'</div>';
+  }).join('');
+  document.querySelectorAll('.lesson').forEach(b=>b.onclick=()=>{state.lesson=b.dataset.id;
+    store.set('lesson',state.lesson);state.step=0;stopPlay();renderA()});
+}
+function renderA(){
+  const l=curLesson(),sc=l[state.scene];
+  document.getElementById('title').textContent=l.title;
+  document.getElementById('en').textContent=l.en;
+  document.getElementById('scenecap').textContent=sc.cap;
+  document.getElementById('sc-better').classList.toggle('sel',state.scene==='better');
+  document.getElementById('sc-plain').classList.toggle('sel',state.scene==='plain');
+  document.getElementById('nodes').innerHTML=sc.steps.map((s,i)=>
+    `<div class="node"><small>0${i+1}</small><b>${s.name}</b></div>`).join('');
+  document.getElementById('tracebody').innerHTML=sc.steps.map((s,i)=>
+    `<tr class="${i===state.step?'cur':''}" data-i="${i}"><td class="no">0${i+1}</td><td>${s.name}</td><td>${s.obs}</td></tr>`).join('');
+  document.querySelectorAll('#tracebody tr').forEach(r=>r.onclick=()=>{state.step=+r.dataset.i;stopPlay();updateStep()});
+  document.getElementById('speedtxt').textContent=state.speed+'×';
+  renderCases();
+  updateStep();updateMini();
+}
+function renderCases(){
+  const c=CASES[curLesson().id];
+  if(!c){document.getElementById('casebox').innerHTML='';return}
+  document.getElementById('casebox').innerHTML=`
+    <div class="ctx">案例对比 · ${esc(c.context)}</div>
+    <div class="casegrid">
+      <div class="persona junior"><div class="who">${esc(c.junior.who)}<small>JUNIOR</small></div>
+        <div class="say">“${esc(c.junior.say)}”</div><div class="pnote">${esc(c.junior.note)}</div></div>
+      <div class="persona senior"><div class="who">${esc(c.senior.who)}<small>SENIOR</small></div>
+        <div class="say">“${esc(c.senior.say)}”</div><div class="pnote">${esc(c.senior.note)}</div></div>
+    </div>
+    <div class="casediff"><b>差在哪：</b>${esc(c.diff)}</div>`;
+}
+function updateStep(){
+  const sc=curLesson()[state.scene],s=sc.steps[state.step];
+  document.getElementById('stepname').textContent=`0${state.step+1} · ${s.name}`;
+  document.getElementById('stepdesc').textContent=s.obs;
+  document.querySelectorAll('#tracebody tr').forEach((r,i)=>r.classList.toggle('cur',i===state.step));
+  drawDot();
+}
+function drawDot(){
+  const n=curLesson()[state.scene].steps.length;
+  const x=12.5+(state.step)*(75/(n-1)), y=30;
+  let svg=document.getElementById('lines');
+  svg.innerHTML='<circle class="traveldot" r="2.6" cx="'+x+'" cy="'+y+'"></circle>';
+}
+function playStep(){
+  const n=curLesson()[state.scene].steps.length;
+  if(state.step>=n-1){stopPlay();return}
+  state.step++;updateStep();
+}
+function startPlay(){
+  const n=curLesson()[state.scene].steps.length;
+  if(state.step>=n-1)state.step=0;
+  state.playing=true;
+  document.getElementById('playic').innerHTML='<path d="M6 5h4v14H6zM14 5h4v14h-4z"/>';
+  state.timer=setInterval(playStep,1400/state.speed);
+}
+function stopPlay(){state.playing=false;clearInterval(state.timer);
+  document.getElementById('playic').innerHTML='<path d="M7 5v14l11-7z"/>';}
+function updateMini(){
+  const done=store.get('done',[]);
+  document.getElementById('mp-text').textContent=done.length+' / 10';
+  document.getElementById('mp-fill').style.width=(done.length*10)+'%';
+}
+function markDone(){const d=new Set(store.get('done',[]));d.add(state.lesson);
+  store.set('done',[...d]);updateMini();}
+
+/* 场景切换 */
+document.getElementById('sc-better').onclick=()=>{state.scene='better';store.set('scene','better');state.step=0;stopPlay();renderA()};
+document.getElementById('sc-plain').onclick=()=>{state.scene='plain';store.set('scene','plain');state.step=0;stopPlay();renderA()};
+document.getElementById('playbtn').onclick=()=>state.playing?stopPlay():startPlay();
+document.getElementById('resetbtn').onclick=()=>{stopPlay();state.step=0;updateStep()};
+document.getElementById('speedtxt').onclick=()=>{state.speed=state.speed>=2?0.5:state.speed+0.5;
+  document.getElementById('speedtxt').textContent=state.speed+'×';if(state.playing){stopPlay();startPlay()}};
+document.getElementById('navsearch').oninput=renderNav;
+document.getElementById('gotrain').onclick=()=>{markDone();switchMode('B')};
+
+/* ================= 模式切换 ================= */
+function switchMode(m){
+  state.mode=m;store.set('mode',m);
+  document.getElementById('modeA').classList.toggle('hidden',m==='B');
+  document.getElementById('modeB').classList.toggle('hidden',m==='A');
+  document.getElementById('m-A').classList.toggle('sel',m==='A');
+  document.getElementById('m-B').classList.toggle('sel',m==='B');
+}
+document.getElementById('m-A').onclick=()=>switchMode('A');
+document.getElementById('m-B').onclick=()=>switchMode('B');
+
+/* 主题 */
+if(store.get('dark',false))document.body.classList.add('dark');
+document.getElementById('themebtn').onclick=()=>{
+  document.body.classList.toggle('dark');store.set('dark',document.body.classList.contains('dark'));
+};
+
+/* ================= B 训练：题库（按场景分类） ================= */
+const BANK_CATS=['业务汇报','日常聊天','学生会汇报','职场申请','面试演讲'];
+const BANK=[
+ /* 业务汇报 */
+ {id:'q1',cat:'业务汇报',title:'季度业绩汇报',
+  raw:'领导，上个季度我们部门完成了850万的业绩，比目标800万多完成了50万。但是跟去年同期相比其实是下降了8%，当时是920万。下降主要是因为市场竞争加剧了，有两家新对手进来，价格战打得很厉害。获客成本从原来的180块涨到了230块，涨了28%。不过我们新增了3个大客户，贡献了200万的业绩。团队现在有12个人，比去年少了2个。',
+  perfect:{conclusion:'Q3业绩同比承压，但客户结构优化，建议加大客户深耕以应对获客成本上升。',
+   points:[
+    {title:'整体业绩微增',evidence:'完成850万，超目标6%，但同比下降8%（去年920万）'},
+    {title:'获客成本上升28%',evidence:'从180元涨到230元，利润空间被挤压'},
+    {title:'新客户结构良好',evidence:'3个大客户贡献200万，客户质量提升'}]}},
+ {id:'q2',cat:'业务汇报',title:'办公设备采购',
+  raw:'领导，我们部门有3台显示器老化了，一台完全黑屏，另外两台颜色发黄、分辨率也不行。IT说修一次要600块，还不能保证能修好，而且这3台都是12年的老设备了，配件很难找。去年已经修过2次，花了1200块。现在新的27寸4K显示器价格是每台1800块，性价比很高。如果用老显示器办公，同事们眼睛容易疲劳，出错率也会上升，影响工作效率。',
+  perfect:{conclusion:'建议更换3台27寸4K显示器，预计投入5400元，可提升舒适度与效率。',
+   points:[
+    {title:'设备老化严重',evidence:'1台报废、2台色偏，12年老设备配件难寻'},
+    {title:'维修性价比低',evidence:'已修2次花费1200元，新机仅1800元/台'},
+    {title:'影响工作效率',evidence:'色偏导致视觉疲劳，增加出错风险'}]}},
+ {id:'q3',cat:'业务汇报',title:'项目进度汇报',
+  raw:'领导，OA系统升级项目目前的情况是这样的：前端开发完成了75%，比计划慢了5天，主要是因为客户临时加了需求。后端接口开发完成了60%，进度正常。数据库迁移方案已经定稿了，但是测试环境部署遇到了点问题，要多等两天。UI设计稿上周已经确认了。计划下周三进行第一轮用户测试，可能会延后两天。预算目前花了40万，预算执行率是35%。',
+  perfect:{conclusion:'项目整体可控，进度略滞后，建议沟通需求变更影响及测试延期。',
+   points:[
+    {title:'前端75%、后端60%',evidence:'前端因需求变更延期5天，后端正常'},
+    {title:'测试环境受阻',evidence:'部署问题需2天，用户测试预计延后'},
+    {title:'预算执行35%',evidence:'略慢于时间进度，属正常范围'}]}},
+ /* 日常聊天 */
+ {id:'q4',cat:'日常聊天',title:'朋友约饭改期',
+  raw:'哎，那个周六的饭啊，我这边突然有点事，可能去不了了，我也说不准几点能弄完，要不你们先吃？其实我也挺想去的，就是最近太忙了，真不好意思，要不下次我请？',
+  perfect:{conclusion:'周六我来不了，先跟你们改期，下周末我做东补一顿。',
+   points:[
+    {title:'先明确给结论',evidence:'直接说“去不了”，不让对方猜'},
+    {title:'一句话说明原因',evidence:'临时有事，不展开细节'},
+    {title:'主动给出替代方案',evidence:'提议下周末并由我请客'}]}},
+ {id:'q5',cat:'日常聊天',title:'婉拒借钱',
+  raw:'那个，借钱的事啊，我最近手头也不太宽裕，房租刚交完，还有信用卡要还，我看看能不能凑一点？不过也不一定有，你也知道我工资不高，要不你再问问别人？',
+  perfect:{conclusion:'这笔钱我暂时借不了，不想耽误你，我帮你想两个别的办法。',
+   points:[
+    {title:'先明确拒绝',evidence:'不模糊拖延，避免给对方错误期待'},
+    {title:'简要说明难处',evidence:'房租和信用卡刚支出，不诉苦'},
+    {title:'提供力所能及的帮助',evidence:'建议预支工资或正规渠道，并可先借小额应急'}]}},
+ {id:'q6',cat:'日常聊天',title:'安慰面试失利',
+  raw:'别难过了，没事的，失败是成功之母嘛，我早就说那家公司要求很高，你下次再努力呗，反正机会多的是，别想太多，走，我请你喝奶茶。',
+  perfect:{conclusion:'这次没成确实可惜，但你准备得很认真，我们一起复盘下次更稳。',
+   points:[
+    {title:'先接住情绪',evidence:'承认可惜，不急于讲大道理'},
+    {title:'肯定对方努力',evidence:'指出具体的准备和优点'},
+    {title:'给建设性下一步',evidence:'陪她复盘面试问题，再定投递计划'}]}},
+ /* 学生会汇报 */
+ {id:'q7',cat:'学生会汇报',title:'招新活动总结',
+  raw:'学长好，这次招新我们摆了三天摊，第一天来的人挺多，后来两天下雨就少了。报名表我数了一下有八十多份，最后交了完整申请表的大概五十个吧，部门那边还想要更多，我觉得宣传也还行，预算买了海报和小礼品，花了三百多，具体数我回头发你。',
+  perfect:{conclusion:'本次招新整体达标，实收 50 份有效申请，建议明年把摊位前移并预留雨天预案。',
+   points:[
+    {title:'核心结果',evidence:'报名 80+、有效申请 50 份，完成部门目标'},
+    {title:'过程与问题',evidence:'后两天下雨导致人流下滑，选址偏内'},
+    {title:'预算与建议',evidence:'支出约 300 元，明细随后发；建议明年加线上宣传'}]}},
+ {id:'q8',cat:'学生会汇报',title:'活动预算申请',
+  raw:'老师，我们下个月想办个迎新晚会，需要一笔钱，大概是场地、音响、奖品这些，可能要几千块，具体我也没算太细，反正别的学校都办得挺好，我们也想办好一点，您看能批多少？',
+  perfect:{conclusion:'迎新晚会申请预算 4800 元，明细分四项，预计覆盖 300 名新生。',
+   points:[
+    {title:'先给总额和用途',evidence:'4800 元，含场地、音响、奖品、物料'},
+    {title:'列清明细',evidence:'每项金额和数量，附比价'},
+    {title:'说明规模与价值',evidence:'覆盖 300 人，有助新生融入'}]}},
+ {id:'q9',cat:'学生会汇报',title:'拉赞助进展',
+  raw:'部长，赞助的事我跑了几家店，奶茶店老板说要考虑，打印店好像有点兴趣，还有一家健身房我还没来得及去，他们都问能给什么宣传，我也不知道怎么答，反正再给我点时间应该能成。',
+  perfect:{conclusion:'赞助目前有 1 家基本意向、2 家待跟进，我需要一份宣传权益清单来推进。',
+   points:[
+    {title:'先说进展',evidence:'打印店意向较强，奶茶店待定，健身房未访'},
+    {title:'点出卡点',evidence:'对方要明确的宣传回报，我缺标准话术'},
+    {title:'请求支持',evidence:'请部长提供权益清单，本周内再访三家'}]}},
+ /* 职场申请 */
+ {id:'q10',cat:'职场申请',title:'调休申请',
+  raw:'领导，我想申请下周三到周五调休三天。主要是家里房子在装修，那几天要安装家具，我老婆一个人盯不过来，还有小孩下周六有运动会，我想把下午也串一下，手头工作我跟小李交代好了，紧急的事手机找我。',
+  perfect:{conclusion:'申请下周三至周五调休 3 天，工作已交接，请批准。',
+   points:[
+    {title:'先给结论',evidence:'明确时间和天数'},
+    {title:'简要理由',evidence:'家装与小孩运动会'},
+    {title:'说明工作安排',evidence:'小李代管，紧急事项手机处理'}]}},
+ {id:'q11',cat:'职场申请',title:'转正申请',
+  raw:'领导，我试用期快到了，这几个月我做了挺多事，天天加班也挺努力的，同事们对我都挺好，我觉得自己应该能胜任，您看能不能给我转正？工资方面我也希望能调整一下。',
+  perfect:{conclusion:'我申请按期转正，用三个月的三项成果说明我已胜任岗位。',
+   points:[
+    {title:'先给结论',evidence:'明确申请转正'},
+    {title:'用成果说话',evidence:'独立负责 2 个项目、提前交付 1 次、零差错'},
+    {title:'表达后续承诺',evidence:'转正后承担更多职责，薪资按公司标准沟通'}]}},
+ /* 面试演讲 */
+ {id:'q12',cat:'面试演讲',title:'自我介绍',
+  raw:'面试官好，我叫小李，今年 23 岁，毕业于某某大学，学的是市场营销，我平时喜欢看书、听音乐，性格开朗，做事认真，我没什么工作经验，但是我愿意学，希望能给我个机会。',
+  perfect:{conclusion:'我是市场营销专业的小李，有两段对口实习，擅长活动策划和数据分析，与这个岗位高度匹配。',
+   points:[
+    {title:'先给匹配定位',evidence:'一句话点出专业和核心优势'},
+    {title:'用 STAR 讲经历',evidence:'实习中独立策划一场活动，带来 20% 增长'},
+    {title:'呼应岗位',evidence:'把能力对应到岗位要求，表达意愿'}]}}
+];
+
+/* 入口切换 */
+function renderCats(){
+  document.getElementById('catpick').innerHTML=BANK_CATS.map(c=>
+    `<button class="${c===state.bankcat?'sel':''}" data-cat="${c}">${c}</button>`).join('');
+  document.querySelectorAll('#catpick button').forEach(b=>b.onclick=()=>{
+    state.bankcat=b.dataset.cat;store.set('bankcat',state.bankcat);renderCats();renderQuestions()});
+}
+function renderQuestions(){
+  const qs=BANK.filter(q=>q.cat===state.bankcat);
+  document.getElementById('qselect').innerHTML=qs.map(q=>`<option value="${q.id}">${q.title}</option>`).join('');
+  showRaw();
+}
+function renderEntry(){
+  document.getElementById('en-bank').classList.toggle('sel',state.entry==='bank');
+  document.getElementById('en-free').classList.toggle('sel',state.entry==='free');
+  document.getElementById('bankpart').classList.toggle('hidden',state.entry==='free');
+  if(state.entry==='bank'){renderCats();renderQuestions()}
+}
+function showRaw(){
+  const q=BANK.find(x=>x.id===document.getElementById('qselect').value)||BANK[0];
+  document.getElementById('rawbox').innerHTML=`<span class="rt">原始信息 · ${q.cat} · 请重组</span>${q.raw}`;
+}
+document.getElementById('en-bank').onclick=()=>{state.entry='bank';store.set('entry','bank');renderEntry()};
+document.getElementById('en-free').onclick=()=>{state.entry='free';store.set('entry','free');renderEntry()};
+document.getElementById('qselect').onchange=showRaw;
+
+/* ================= 分析引擎 ================= */
+function firstSentence(t){const s=t.split(/[。！？\n]/).filter(x=>x.trim())[0]||'';return s.trim()}
+function extractPoints(t){
+  const parts=t.split(/(?:第一|第二|第三|首先|其次|然后|最后|\d[.、])/).map(s=>s.trim()).filter(s=>s.length>8);
+  return parts.length>=2?parts:t.split(/[。！？]/).filter(s=>s.trim().length>10);
+}
+function keywords(s){
+  const words=s.match(/[一-龥]{2,4}/g)||[];
+  return [...new Set(words)].filter(w=>!['我们','一个','可以','因为','所以','领导','目前'].includes(w));
+}
+function analyze(text){
+  const r={score:0,dims:{},problems:[]};
+  // 1 结论先行
+  const fs=firstSentence(text);
+  const cWords=['因此','建议','结论','需要','必须','提议','核心','总结','我认为','申请'];
+  const bWords=['因为','虽然','首先','之前','背景','根据','领导好','是这样','情况是'];
+  let cFirst=cWords.some(w=>fs.includes(w))&&!bWords.some(w=>fs.includes(w));
+  let cScore=cFirst?85:40; if(fs.length>80)cScore-=15;
+  r.dims['结论先行']={score:cScore,pass:cScore>=60};
+  if(!cFirst)r.problems.push({dim:'结论先行',text:'开头更像背景铺垫，没有直接给结论',
+    sug:'用「因此」「建议」「核心是」等词开头，直接抛出结论'});
+  // 2 论点独立性
+  const pts=extractPoints(text),kws=pts.map(keywords);
+  let overlap=0,pairs=0;
+  for(let i=0;i<kws.length;i++)for(let j=i+1;j<kws.length;j++){pairs++;
+    const inter=kws[i].filter(k=>kws[j].includes(k));
+    const uni=new Set([...kws[i],...kws[j]]);
+    if(inter.size/uni.size>0.3)overlap++;}
+  let mScore=pts.length>=2?Math.max(30,100-(overlap/Math.max(pairs,1))*50):55;
+  r.dims['论点独立性']={score:mScore,pass:mScore>=55};
+  if(mScore<55)r.problems.push({dim:'论点独立性',text:'论点之间存在内容交叉',
+    sug:'确认各点讲不同方面，合并重复内容'});
+  // 3 论据充分
+  const ev=[/[0-9]+%/,/[0-9]+(?:人|次|台|个|起|例|万|元|块)/,/数据|根据|相比|增长|下降/,/共计|平均|累计|完成|占比/];
+  let ec=ev.filter(p=>p.test(text)).length;
+  let eScore=Math.min(100,40+ec*20);
+  r.dims['论据充分性']={score:eScore,pass:eScore>=60};
+  if(eScore<60)r.problems.push({dim:'论据充分性',text:'缺少具体数据或事实支撑',
+    sug:'加数字（百分比、金额、人数）、对比或案例来支撑论点'});
+  // 4 逻辑顺序
+  const num=/第一.*第二|1.*2.*3|一.*二|首先.*然后/.test(text);
+  let oScore=num?80:(pts.length>1?55:70);
+  r.dims['逻辑顺序']={score:oScore,pass:oScore>=60};
+  if(oScore<60)r.problems.push({dim:'逻辑顺序',text:'论点排列缺乏明显顺序',
+    sug:'用编号（第一、第二）或顺序词（首先、然后、最后）组织'});
+  // 加权
+  const w={'结论先行':.3,'论据充分性':.3,'论点独立性':.25,'逻辑顺序':.15};
+  r.score=Math.round(Object.keys(w).reduce((s,k)=>s+r.dims[k].score*w[k],0));
+  Object.keys(r.dims).forEach(k=>{if(r.dims[k].pass&&!r.problems.find(p=>p.dim===k))
+    r.problems.push({dim:k,pass:true})});
+  return r;
+}
+function esc(s){return s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]))}
+
+/* 渲染结果 */
+function renderResult(text,perfect){
+  const a=analyze(text),C=2*Math.PI*50,off=C-(a.score/100)*C;
+  const badge=a.score>=90?'金牌':a.score>=75?'银牌':a.score>=60?'铜牌':'';
+  const colors={pass:'var(--success)',fail:'var(--danger)'};
+  const dimHtml=Object.entries(a.dims).map(([k,d])=>
+    `<div class="dimbar"><span class="dl">${k}</span><div class="dc">
+      <div class="df" style="width:${d.score}%;background:${d.pass?'var(--success)':'var(--danger)'}"></div></div>
+      <span class="ds">${d.score}</span></div>`).join('');
+  const fbHtml=a.problems.map(p=>p.pass
+    ?`<div class="fb pass"><div class="fi">✓</div><div><div class="ftitle">${p.dim}</div><div class="ftext">表现良好</div></div></div>`
+    :`<div class="fb fail"><div class="fi">✗</div><div><div class="ftitle">${p.dim}</div>
+       <div class="ftext">${p.text}</div><div class="fsug">${p.sug}</div></div></div>`).join('');
+  // 逐句对照
+  const fs=firstSentence(text),cFirst=a.dims['结论先行'].pass,tooLong=fs.length>80;
+  const cmpHtml=`<div class="cmpitem ${cFirst&&!tooLong?'good':'bad'}">
+      <span class="tag">${cFirst&&!tooLong?'结论先行':'结论未前置'}</span>
+      <div><strong>你的开头：</strong>${esc(fs.substring(0,70))}${fs.length>70?'…':''}</div>
+      <div style="color:var(--muted);margin-top:4px"><strong>完美示范：</strong>${esc(perfect.conclusion)}</div>
+      ${tooLong?'<div style="color:var(--danger);margin-top:6px;font-size:12.5px">开头控制在 80 字内，直接抛结论</div>':''}
+    </div>`;
+  const pyrHtml=`<div class="pyr"><div class="pconc">${esc(perfect.conclusion)}</div>
+      <div class="ppoints">${perfect.points.map(p=>`<div class="ppoint"><b>${esc(p.title)}</b><span>${esc(p.evidence)}</span></div>`).join('')}</div></div>`;
+  document.getElementById('result').innerHTML=`
+    <div class="scorecard">
+      <div class="ring"><svg width="130" height="130" viewBox="0 0 120 120">
+        <circle cx="60" cy="60" r="50" fill="none" stroke="var(--line)" stroke-width="10"/>
+        <circle cx="60" cy="60" r="50" fill="none" stroke="var(--accent)" stroke-width="10"
+          stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${off}"/></svg>
+        <div class="num"><b>${a.score}</b><small>${badge||'继续加油'}</small></div></div>
+      <div class="dimbars">${dimHtml}</div>
+    </div>
+    <div class="fblist">${fbHtml}</div>
+    <div class="compare"><h3>逐句对照</h3>${cmpHtml}</div>
+    <div class="perfect"><h3>完美版本 · 金字塔</h3>${pyrHtml}</div>`;
+  saveHistory(text,a.score);
+}
+function saveHistory(text,score){
+  const h=store.get('history',[]);
+  h.unshift({at:new Date().toLocaleString('zh-CN'),score,entry:state.entry});
+  store.set('history',h.slice(0,30));
+}
+document.getElementById('analyzebtn').onclick=()=>{
+  const text=document.getElementById('usertext').value.trim();
+  if(text.length<15){document.getElementById('usertext').focus();return}
+  const perfect=state.entry==='bank'
+    ?(BANK.find(x=>x.id===document.getElementById('qselect').value)||BANK[0]).perfect
+    :{conclusion:'（自由表达无固定答案，参考各维度建议改写）',
+      points:[{title:'先给结论',evidence:'第一句直接抛判断'},{title:'再给支撑',evidence:'论点独立、配数据'}]};
+  renderResult(text,perfect);
+};
+document.getElementById('clearbtn').onclick=()=>{document.getElementById('usertext').value='';
+  document.getElementById('result').innerHTML='';document.getElementById('usertext').focus()};
+
+renderEntry();
+
+renderNav();renderA();
+if(state.mode==='B')switchMode('B');
+
+</script>
+</body>
+</html>
