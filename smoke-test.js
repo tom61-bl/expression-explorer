@@ -41,8 +41,8 @@ const ctx={
 ctx.window=ctx;
 ctx.globalThis=ctx;
 vm.createContext(ctx);
-vm.runInContext(script+'\nthis.__exp={runChecks,renderBlock,CHEAT_SHEET,FRAMEWORKS,PREFLIGHT_QUESTIONS};',ctx);
-const {runChecks,renderBlock,CHEAT_SHEET,FRAMEWORKS,PREFLIGHT_QUESTIONS}=ctx.__exp;
+vm.runInContext(script+'\nthis.__exp={runChecks,renderBlock,CHEAT_SHEET,FRAMEWORKS,PREFLIGHT_QUESTIONS,LAYOUTS,LESSONS};',ctx);
+const {runChecks,renderBlock,CHEAT_SHEET,FRAMEWORKS,PREFLIGHT_QUESTIONS,LAYOUTS,LESSONS}=ctx.__exp;
 
 let pass=0,fail=0;
 function check(name,cond){if(cond){pass++;console.log('  PASS',name);}else{fail++;console.log('  FAIL',name);}}
@@ -82,6 +82,17 @@ check('框架都有 name/source/blocks',FRAMEWORKS.every(f=>f.name&&f.source&&Ar
 check('框架 block 类型合法',FRAMEWORKS.every(f=>f.blocks.every(b=>['p','table','quote','note','preflight'].includes(b.t))));
 check('table 块 head/rows 齐备',FRAMEWORKS.every(f=>f.blocks.filter(b=>b.t==='table').every(b=>b.head&&b.rows&&b.rows.length)));
 check('自检 5 问',PREFLIGHT_QUESTIONS.length===5);
+
+console.log('[流程图布局]');
+const layoutNames=Object.keys(LAYOUTS);
+check('6 种布局',layoutNames.length===6);
+check('每个布局 4 节点',layoutNames.every(k=>LAYOUTS[k].nodes.length===4));
+check('节点坐标齐备',layoutNames.every(k=>LAYOUTS[k].nodes.every(g=>['x','y','w','h'].every(p=>typeof g[p]==='number'))));
+check('节点在 100 范围内',layoutNames.every(k=>LAYOUTS[k].nodes.every(g=>g.x>=0&&g.x+g.w<=100&&g.y>=0&&g.y+g.h<=100)));
+check('edges 索引合法',layoutNames.every(k=>LAYOUTS[k].edges.every(e=>Array.isArray(e)&&e.length===2&&e.every(i=>i>=0&&i<4))));
+check('better layout 合法',LESSONS.every(l=>!!LAYOUTS[l.better.layout]));
+check('plain 无自定义 layout',LESSONS.every(l=>!l.plain.layout));
+check('每课每场景 4 步骤',LESSONS.every(l=>l.better.steps.length===4&&l.plain.steps.length===4));
 
 console.log('\n==== '+pass+' passed, '+fail+' failed ====');
 process.exit(fail?1:0);

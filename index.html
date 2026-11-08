@@ -4,26 +4,32 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>表达力探索 · Expression Explorer</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>◈</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect x='14' y='20' width='72' height='60' rx='6' fill='none' stroke='%232c5344' stroke-width='8'/><line x1='28' y1='40' x2='72' y2='40' stroke='%232c5344' stroke-width='8' stroke-linecap='round'/><line x1='28' y1='56' x2='58' y2='56' stroke='%232c5344' stroke-width='8' stroke-linecap='round'/></svg>">
 <style>
 :root{
-  --paper:#f6f4ef; --ink:#1a1f2e; --soft:#3a4252; --muted:#7a8290;
-  --line:#dcd8ce; --card:#fffdf8;
-  --navy:#1e3a5f; --terra:#b85c2a; --forest:#3a6b5c; --accent:#1e3a5f;
-  --danger:#c0504a; --success:#4a9e6a; --warn:#c99a3f;
+  --paper:#eef0ec; --ink:#1c211e; --soft:#46504a; --muted:#7a857e;
+  --line:#d3d8d1; --card:#fafaf6;
+  --navy:#1c211e; --terra:#a83a2e; --forest:#3f7a5a; --accent:#2c5344;
+  --danger:#a83a2e; --success:#3f7a5a; --warn:#a87828;
   --mono:ui-monospace,"SF Mono","Cascadia Mono",Consolas,"Courier New",monospace;
   --sans:"PingFang SC","Microsoft YaHei","Hiragino Sans GB",system-ui,sans-serif;
+  --serif:"Songti SC","STSong","Noto Serif SC","Source Han Serif SC",Georgia,serif;
 }
 body.dark{
-  --paper:#14171f; --ink:#e8eaf0; --soft:#c4c9d4; --muted:#8891a0;
-  --line:#2a3040; --card:#1c212c;
-  --navy:#6f9bd8; --terra:#d98a5c; --forest:#6fa58f;
-  --danger:#e07870; --success:#6bc48e; --warn:#dcb46a;
+  --paper:#141a16; --ink:#e5e9e3; --soft:#b9c2b9; --muted:#7e8a80;
+  --line:#2a342e; --card:#1a211c;
+  --navy:#e5e9e3; --terra:#d97a6a; --forest:#7fb89a;
+  --accent:#7fb89a;
+  --danger:#d97a6a; --success:#7fb89a; --warn:#d2a86a;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
 body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:15px;
-  line-height:1.7;-webkit-font-smoothing:antialiased;transition:background .3s,color .3s}
+  line-height:1.75;-webkit-font-smoothing:antialiased;transition:background .3s,color .3s}
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.035;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E")}
+body.dark::before{opacity:.06}
+#modeA,#modeB,header.topbar{position:relative;z-index:1}
 button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
 .hidden{display:none!important}
 .svgic{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.8;
@@ -32,9 +38,9 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 /* 顶栏 */
 .topbar{height:58px;display:flex;align-items:center;gap:16px;padding:0 20px;
   border-bottom:1px solid var(--line);background:var(--paper);position:sticky;top:0;z-index:20}
-.brand{font-weight:700;font-size:16px}
+.brand{font-weight:700;font-size:17px;font-family:var(--serif);letter-spacing:.01em}
 .brand small{font-family:var(--mono);font-size:9.5px;color:var(--muted);font-weight:400;
-  letter-spacing:.14em;display:block;text-transform:uppercase}
+  letter-spacing:.12em;display:block;text-transform:none}
 .modepick{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
 .modepick button{padding:7px 18px;font-size:13.5px;color:var(--soft);display:flex;gap:7px;align-items:center}
 .modepick button.sel{background:var(--accent);color:#fff}
@@ -63,23 +69,24 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 .lesson.active .ldot{background:var(--accent)}
 .lesson .lt{flex:1}
 .lesson small{font-family:var(--mono);font-size:9px;color:var(--muted);display:block;letter-spacing:.08em}
-.anti-entry{width:100%;text-align:left;padding:9px 10px;border-radius:8px;font-size:13px;
+.anti-entry{width:100%;text-align:left;padding:10px;border-radius:6px;font-size:13px;min-height:44px;
+  display:flex;align-items:center;gap:8px;
   color:var(--terra);border:1px dashed var(--line);margin-top:6px}
 .anti-entry:hover{background:var(--card)}
 .main{overflow-y:auto;padding:22px 26px;display:flex;flex-direction:column;gap:18px}
-.head{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:10px}
-.head h1{font-size:26px}
-.head .en{font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase}
-.seg{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
-.seg button{padding:7px 16px;font-size:13px;color:var(--soft)}
+.head{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:14px}
+.head h1{font-size:34px;font-family:var(--serif);font-weight:700;line-height:1.2;letter-spacing:.01em}
+.head .en{font-family:var(--mono);font-size:11.5px;color:var(--muted);letter-spacing:.04em;text-transform:none}
+.seg{display:flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.seg button{padding:11px 22px;font-size:15px;color:var(--soft);min-height:44px}
 .seg button.sel{background:var(--accent);color:#fff}
-.stage{position:relative;border:1px solid var(--line);border-radius:12px;background:var(--card);
-  padding:24px 20px 18px;min-height:228px}
-.stage .cap{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.12em;
-  text-transform:uppercase;margin-bottom:16px}
-.nodes{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;position:relative;z-index:2}
-.node{border:1px solid var(--line);border-radius:10px;padding:12px 8px;text-align:center;background:var(--paper)}
-.node b{display:block;font-size:14px}
+.stage{position:relative;border:1px solid var(--line);border-radius:8px;background:var(--card);
+  padding:22px 22px 20px}
+.stage .cap{font-family:var(--sans);font-size:12.5px;color:var(--muted);margin-bottom:14px}
+.nodes{position:relative;width:100%;height:236px;z-index:2}
+.node{position:absolute;border:1px solid var(--line);border-radius:6px;padding:8px 6px;text-align:center;
+  background:var(--paper);display:flex;flex-direction:column;justify-content:center;overflow:hidden}
+.node b{display:block;font-size:14px;font-family:var(--serif);font-weight:600;line-height:1.35}
 .node small{font-family:var(--mono);font-size:9px;color:var(--muted);letter-spacing:.06em}
 .stage svg.lines{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none}
 .traveldot{fill:var(--accent);filter:drop-shadow(0 0 5px var(--accent))}
@@ -157,10 +164,10 @@ button{font-family:inherit;cursor:pointer;border:none;background:none;color:inhe
 .catpick button.sel{background:var(--accent);color:#fff;border-color:var(--accent)}
 .qpick{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--card);
   color:var(--ink);font-family:inherit;font-size:14px;margin-bottom:14px}
-.rawbox{background:var(--card);border:1px solid var(--line);border-left:4px solid var(--warn);border-radius:10px;
+.rawbox{background:var(--card);border:1px solid var(--line);border-radius:8px;
   padding:16px 18px;font-size:13.5px;color:var(--soft);margin-bottom:14px;white-space:pre-wrap}
-.rawbox .rt{font-family:var(--mono);font-size:10px;color:var(--muted);letter-spacing:.1em;
-  text-transform:uppercase;display:block;margin-bottom:8px}
+.rawbox .rt{font-family:var(--mono);font-size:10px;color:var(--warn);letter-spacing:.08em;
+  display:block;margin-bottom:8px}
 textarea{width:100%;min-height:210px;background:var(--card);border:1px solid var(--line);border-radius:10px;
   padding:16px;font-family:var(--sans);font-size:15px;line-height:1.8;color:var(--ink);resize:vertical}
 textarea:focus{outline:none;border-color:var(--accent)}
@@ -190,10 +197,10 @@ textarea:focus{outline:none;border-color:var(--accent)}
 .checkgroup b{font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:var(--muted);
   text-transform:uppercase;display:block;margin-bottom:10px}
 .checklist{display:flex;flex-direction:column;gap:10px}
-.chk{border-radius:10px;padding:14px 16px;display:flex;gap:13px;align-items:flex-start;
+.chk{border-radius:8px;padding:14px 16px;display:flex;gap:13px;align-items:flex-start;
   border:1px solid var(--line)}
-.chk.pass{background:color-mix(in srgb,var(--success) 10%,transparent);border-left:4px solid var(--success)}
-.chk.fail{background:color-mix(in srgb,var(--danger) 9%,transparent);border-left:4px solid var(--danger)}
+.chk.pass{background:color-mix(in srgb,var(--success) 10%,transparent);border-color:color-mix(in srgb,var(--success) 35%,var(--line))}
+.chk.fail{background:color-mix(in srgb,var(--danger) 9%,transparent);border-color:color-mix(in srgb,var(--danger) 35%,var(--line))}
 .chk .ci{width:25px;height:25px;border-radius:50%;flex:none;display:flex;align-items:center;
   justify-content:center;color:#fff;font-size:12.5px;font-weight:700}
 .chk.pass .ci{background:var(--success)} .chk.fail .ci{background:var(--danger)}
@@ -202,9 +209,9 @@ textarea:focus{outline:none;border-color:var(--accent)}
 .chk .csug{font-size:13px;color:var(--accent);margin-top:7px;padding-top:7px;border-top:1px dashed var(--line)}
 .compare{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px}
 .compare h3,.perfect h3{font-size:16px;margin-bottom:14px}
-.cmpitem{border-radius:10px;padding:14px 16px;margin-bottom:10px;font-size:13.5px}
-.cmpitem.good{border-left:4px solid var(--success);background:color-mix(in srgb,var(--success) 9%,transparent)}
-.cmpitem.bad{border-left:4px solid var(--danger);background:color-mix(in srgb,var(--danger) 9%,transparent)}
+.cmpitem{border-radius:8px;padding:14px 16px;margin-bottom:10px;font-size:13.5px;border:1px solid var(--line)}
+.cmpitem.good{border-color:color-mix(in srgb,var(--success) 35%,var(--line));background:color-mix(in srgb,var(--success) 9%,transparent)}
+.cmpitem.bad{border-color:color-mix(in srgb,var(--danger) 35%,var(--line));background:color-mix(in srgb,var(--danger) 9%,transparent)}
 .cmpitem .tag{display:inline-block;padding:2px 8px;border-radius:5px;color:#fff;font-size:11px;margin-bottom:6px}
 .cmpitem.good .tag{background:var(--success)} .cmpitem.bad .tag{background:var(--danger)}
 .perfect{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px}
@@ -215,7 +222,8 @@ textarea:focus{outline:none;border-color:var(--accent)}
 .ppoint b{font-size:14px} .ppoint span{display:block;font-size:13px;color:var(--muted);margin-top:3px}
 
 /* 侧栏专题入口 */
-.side-entry{width:100%;text-align:left;padding:9px 10px;border-radius:8px;font-size:13px;
+.side-entry{width:100%;text-align:left;padding:10px;border-radius:6px;font-size:13px;min-height:44px;
+  display:flex;align-items:center;gap:8px;
   color:var(--soft);border:1px solid var(--line);margin-top:8px}
 .side-entry:hover{background:var(--card);border-color:var(--accent)}
 
@@ -267,10 +275,30 @@ textarea:focus{outline:none;border-color:var(--accent)}
     transform:translateX(-100%);transition:transform .25s ease;background:var(--paper)}
   .sidebar.open{transform:none}
   .main{padding:18px 16px}
-  .nodes{grid-template-columns:repeat(2,1fr)}
   .casegrid{grid-template-columns:1fr}
-  .modepick button{padding:7px 12px}
+  .modepick button{min-height:40px;padding:7px 14px}
   .minibar{display:none}
+  /* 流程图退化为纵向列表 */
+  .nodes{height:auto;display:flex;flex-direction:column;gap:10px}
+  .node{position:static;width:100%;height:auto;min-height:52px;flex-direction:row;
+    align-items:center;justify-content:flex-start;gap:10px;text-align:left;padding:12px 14px}
+  .node small{flex:none}
+  .stage svg.lines{display:none}
+  .ctrl{flex-wrap:wrap}
+  .ctrl .pill{order:-1}
+  .trace-scroll{overflow-x:auto}
+  .trace{min-width:480px}
+}
+@media(max-width:480px){
+  .head h1{font-size:28px}
+  .seg{width:100%}
+  .seg button{flex:1;padding:12px 8px}
+  .bwrap{padding:20px 16px 50px}
+  .bh h2{font-size:21px}
+  .btnrow{flex-direction:column}
+  .btnrow button{width:100%;min-height:48px}
+  .entrypick button,.audtab{min-height:44px;flex:1}
+  .compare,.perfect,.audversion{padding:16px}
 }
 </style>
 </head>
@@ -300,9 +328,12 @@ textarea:focus{outline:none;border-color:var(--accent)}
   <aside class="sidebar" id="sidebar">
     <input class="search" id="navsearch" placeholder="搜索课程 / 关键词…">
     <div id="nav"></div>
-    <button class="side-entry" id="cheat-entry">一页速查 →</button>
-    <button class="side-entry" id="fw-entry">经典框架库 →</button>
-    <button class="anti-entry" id="anti-entry">反模式速查 →</button>
+    <button class="side-entry" id="cheat-entry">
+      <svg class="svgic" viewBox="0 0 24 24"><path d="M6 3h9l3 3v15H6z"/><path d="M9 11h6M9 15h6M9 7h3"/></svg>一页速查</button>
+    <button class="side-entry" id="fw-entry">
+      <svg class="svgic" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>经典框架库</button>
+    <button class="anti-entry" id="anti-entry">
+      <svg class="svgic" viewBox="0 0 24 24"><path d="M12 3 2 20h20z"/><path d="M12 10v4M12 17.5v.5"/></svg>反模式速查</button>
   </aside>
   <div class="main">
     <div id="lesson-view">
@@ -318,8 +349,9 @@ textarea:focus{outline:none;border-color:var(--accent)}
       </div>
       <div class="stage">
         <div class="cap" id="scenecap"></div>
-        <svg class="lines" id="lines" preserveAspectRatio="none" viewBox="0 0 100 100"></svg>
-        <div class="nodes" id="nodes"></div>
+        <div class="nodes" id="nodes">
+          <svg class="lines" id="lines" preserveAspectRatio="none" viewBox="0 0 100 100"></svg>
+        </div>
       </div>
       <div class="ctrl">
         <button class="iconbtn" id="playbtn">
@@ -334,10 +366,12 @@ textarea:focus{outline:none;border-color:var(--accent)}
           <div class="stepdesc" id="stepdesc"></div>
         </div>
       </div>
+      <div class="trace-scroll">
       <table class="trace">
         <thead><tr><th style="width:46px">#</th><th style="width:30%">本步</th><th>对方此刻在想什么</th></tr></thead>
         <tbody id="tracebody"></tbody>
       </table>
+      </div>
       <div class="casebox" id="casebox"></div>
       <div class="drillcard" id="drillcard"></div>
       <div class="gotrain"><button id="gotrain">去完整工坊练一轮 →</button></div>
@@ -404,9 +438,9 @@ textarea:focus{outline:none;border-color:var(--accent)}
 <script>
 /* ================= 数据：10 课 ================= */
 const GROUPS=[
-  {id:'g0',name:'结构',color:'#1e3a5f'},
-  {id:'g1',name:'增量与语气',color:'#b85c2a'},
-  {id:'g2',name:'场景',color:'#3a6b5c'}
+  {id:'g0',name:'结构',color:'#2c5344'},
+  {id:'g1',name:'增量与语气',color:'#a83a2e'},
+  {id:'g2',name:'场景',color:'#3f7a5a'}
 ];
 const LESSONS=[
  {id:'conclusion-first',group:'g0',title:'结论先行',en:'Conclusion First',
@@ -415,7 +449,7 @@ const LESSONS=[
     hint:'用"我建议 / 结论是 / 会延期"开头，30 字以内。',
     words:['建议','结论','延期','会','不能'],maxlen:30,
     example:'项目会延期三天，我建议从 B 组借两人。'},
-  better:{cap:'更好说法 · 30 秒内先给答案',steps:[
+  better:{layout:'converge',cap:'更好说法 · 30 秒内先给答案',steps:[
    {name:'开口先给结论',obs:'第一句我就知道你要我做什么，不用自己往下猜'},
    {name:'再给三个支撑点',obs:'三个点彼此不重叠，我跟起来不费劲'},
    {name:'用数据补强',obs:'有具体数字，我对这个判断更放心'},
@@ -431,7 +465,7 @@ const LESSONS=[
     hint:'一句话里要出现归类，不展开细节，35 字以内。',
     words:['原因','两类','因为','在于','分为'],maxlen:35,
     example:'销量下滑有内外两类原因，外部竞争、内部断货。'},
-  better:{cap:'更好说法 · 先塔尖后塔基',steps:[
+  better:{layout:'pyramid',cap:'更好说法 · 先塔尖后塔基',steps:[
    {name:'塔尖放中心思想',obs:'一句话先告诉我全貌，下面的细节我知道往哪放'},
    {name:'分 2-4 组论点',obs:'分组清晰，我可以一组一组地消化'},
    {name:'每组下挂证据',obs:'论点下面就是事实，层次不会乱'},
@@ -447,7 +481,7 @@ const LESSONS=[
     hint:'用"但是 / 然而 / 却"制造张力，35 字以内。',
     words:['但是','然而','却','而','矛盾'],maxlen:35,
     example:'复购率连续两季走低，老客户正在流向对手。'},
-  better:{cap:'更好说法 · 有开场有结构',steps:[
+  better:{layout:'linear',cap:'更好说法 · 有开场有结构',steps:[
    {name:'S 情境引入',obs:'背景我熟悉，很快就能进入状态'},
    {name:'C 冲突制造张力',obs:'矛盾点出来了，我想知道答案是什么'},
    {name:'Q 抛出问题',obs:'问题明确，我知道接下来要解决什么'},
@@ -463,7 +497,7 @@ const LESSONS=[
     hint:'每件事一句话，不写背景，40 字以内。',
     words:['本周','新增','上线','完成','需要'],maxlen:40,
     example:'本周首页改版上线、转化提升 2 个点，需要您拍板预算。'},
-  better:{cap:'更好说法 · 每句都有新信息',steps:[
+  better:{layout:'funnel',cap:'更好说法 · 每句都有新信息',steps:[
    {name:'先问对方知道吗',obs:'已知的一句带过，我不用再听重复'},
    {name:'只讲增量部分',obs:'都是新信息，我这几分钟没有浪费'},
    {name:'删掉正确废话',obs:'没有"要重视"这种空话，每句都有内容'},
@@ -479,7 +513,7 @@ const LESSONS=[
     hint:'用百分比或人数，说清时间范围，40 字以内。',
     words:['%','个','人','天','倍'],maxlen:40,
     example:'近 30 天流失率从 5% 升到 8%，70% 卡在验证码环节。'},
-  better:{cap:'更好说法 · 下梯子到事实',steps:[
+  better:{layout:'funnel',cap:'更好说法 · 下梯子到事实',steps:[
    {name:'下抽象梯子',obs:'不再是"效果不好"，我能看见具体哪里不好'},
    {name:'加数字',obs:'有时间和数量，我对程度有了概念'},
    {name:'给可感知细节',obs:'一个具体场景，我脑子里有画面'},
@@ -490,12 +524,12 @@ const LESSONS=[
    {name:'缺乏画面感',obs:'我无法在脑中形成具体印象'},
    {name:'边界模糊',obs:'一刀切的表述，我轻易就能想到反例'}]}},
  {id:'certainty',group:'g1',title:'确定感',en:'Sense of Certainty',
-  pitfall:'确定感不是把"不知道"说成"知道"——没有把握时，给出确定的复盘时间比硬给答案更可信。',
+  pitfall:'确定感有边界：没有把握时，别把"不知道"说成"知道"，给出确定的复盘时间比硬给答案更可信。',
   drill:{q:'把"我尽量下周给"改成确定承诺：要有明确时间点。',
     hint:'写出具体日期或钟点，以及交付物，35 字以内。',
     words:['点','前','交付','给','周三'],maxlen:35,
     example:'我周三下午 6 点前交付初稿，周五给终稿。'},
-  better:{cap:'更好说法 · 干净利落',steps:[
+  better:{layout:'linear',cap:'更好说法 · 干净利落',steps:[
    {name:'去掉口头禅',obs:'没有"嗯""那个"，我听着更专业'},
    {name:'动词优先',obs:'动作明确，我知道谁在做什么'},
    {name:'语气三参数到位',obs:'音量语速停顿有控制，重点我接得住'},
@@ -511,7 +545,7 @@ const LESSONS=[
     hint:'用"或者 / 要么"连接两个可选项，40 字以内。',
     words:['或者','要么','可以','方案','一个'],maxlen:40,
     example:'两个对策：折扣续约，或者免费升级服务，建议今天先约对方。'},
-  better:{cap:'更好说法 · 结论+风险+请求',steps:[
+  better:{layout:'branch',cap:'更好说法 · 结论+风险+请求',steps:[
    {name:'汇报先给结论',obs:'结果先行，我立刻知道大局'},
    {name:'坏消息带方案',obs:'问题之外有两个对策，我只需要做选择'},
    {name:'布置讲清五要素',obs:'任务标准期限资源验收都在，我不用猜'},
@@ -522,12 +556,12 @@ const LESSONS=[
    {name:'布置只说去做',obs:'没讲标准期限，我只能靠猜'},
    {name:'不做确认',obs:'理解偏差到交付时才暴露，返工成本高'}]}},
  {id:'interview-speech',group:'g2',title:'面试与演讲',en:'Interview & Speech',
-  pitfall:'三点结构是容器不是填充物——没有三个独立要点时，讲透两点比硬凑三点强。',
+  pitfall:'三点结构只是容器，没有三个独立要点时，讲透两点比硬凑三点强。',
   drill:{q:'只写 STAR 里的"结果"：用一个可量化结果收尾。',
     hint:'用百分比、倍数或金额，30 字以内。',
     words:['%','倍','人','万','增长'],maxlen:30,
     example:'报名人数翻了一倍，成本下降 20%。'},
-  better:{cap:'更好说法 · 有框架有承诺',steps:[
+  better:{layout:'linear',cap:'更好说法 · 有框架有承诺',steps:[
    {name:'用 STAR 讲案例',obs:'情境任务行动结果完整，我能判断真实分量'},
    {name:'开场给赋能承诺',obs:'先告诉我能带走什么，我愿意听下去'},
    {name:'主体三点结构',obs:'只有三个重点，我记得住'},
@@ -543,7 +577,7 @@ const LESSONS=[
     hint:'写时间、事件和后果，不贴标签，40 字以内。',
     words:['周三','晚','天','次','这次'],maxlen:40,
     example:'这周三的报告你晚交了两天，导致团队评审顺延。'},
-  better:{cap:'更好说法 · 对事不对人',steps:[
+  better:{layout:'branch',cap:'更好说法 · 对事不对人',steps:[
    {name:'SBI 描述行为',obs:'只说事实不贴标签，我不会立刻防御'},
    {name:'STATE 讲事实',obs:'先事实后感受，我感到被尊重'},
    {name:'OFNR 表达需求',obs:'观察感受需要请求，我听得懂你要什么'},
@@ -554,16 +588,16 @@ const LESSONS=[
    {name:'翻旧账',obs:'过去的事一起搬出来，我不想再谈'},
    {name:'单向输出',obs:'没有我说话的机会，这次谈话注定崩'}]}},
  {id:'listen-humor',group:'g2',title:'倾听提问与幽默',en:'Listening & Humor',
-  pitfall:'共情不是比惨——"这有什么，我上次更惨"会把对方的情绪直接关掉。',
+  pitfall:'共情要避免比惨——"这有什么，我上次更惨"会把对方的情绪直接关掉。',
   drill:{q:'只写共情那一句：先复述对方的感受，不着急给建议。',
     hint:'用"听起来 / 感觉"开头，35 字以内。',
     words:['听起来','感觉','委屈','难受','理解'],maxlen:35,
     example:'听起来你觉得付出没被看见，挺委屈的，具体是哪件事？'},
-  better:{cap:'更好说法 · 先听懂再开口',steps:[
+  better:{layout:'cycle',cap:'更好说法 · 先听懂再开口',steps:[
    {name:'共情倾听',obs:'先回应我的情绪，我觉得被看见'},
    {name:'确认理解',obs:'复述我的意思，我知道你听懂了'},
    {name:'提开放式好问题',obs:'"怎么/为什么"让我可以往深说'},
-   {name:'幽默有分寸',obs:'自嘲而非取笑，我感到放松而不是被刺'}]},
+   {name:'幽默有分寸',obs:'自嘲多于取笑，我感到放松，没有被刺'}]},
   plain:{cap:'普通说法 · 急着回应',steps:[
    {name:'打断对方',obs:'话没说完你就给建议，我觉得没被听见'},
    {name:'自说自话',obs:'不确认我的意思，你在讲自己的故事'},
@@ -571,10 +605,32 @@ const LESSONS=[
    {name:'幽默越界',obs:'拿我的痛点开玩笑，我被伤到了'}]}}
 ];
 
+/* ================= 流程图布局几何（单位 %，viewBox 0-100） ================= */
+const LAYOUTS={
+ linear:{nodes:[
+   {x:0,y:36,w:22,h:28},{x:26,y:36,w:22,h:28},{x:52,y:36,w:22,h:28},{x:78,y:36,w:22,h:28}],
+   edges:[[0,1],[1,2],[2,3]]},
+ pyramid:{nodes:[
+   {x:35,y:0,w:30,h:26},{x:0,y:58,w:30,h:32},{x:35,y:58,w:30,h:32},{x:70,y:58,w:30,h:32}],
+   edges:[[0,1],[0,2],[0,3]]},
+ funnel:{nodes:[
+   {x:10,y:0,w:80,h:18},{x:18,y:27,w:64,h:18},{x:26,y:54,w:48,h:18},{x:34,y:81,w:32,h:18}],
+   edges:[[0,1],[1,2],[2,3]]},
+ branch:{nodes:[
+   {x:30,y:0,w:40,h:24},{x:2,y:42,w:38,h:28},{x:60,y:42,w:38,h:28},{x:30,y:80,w:40,h:20}],
+   edges:[[0,1],[0,2],[1,3],[2,3]]},
+ converge:{nodes:[
+   {x:2,y:0,w:32,h:28},{x:34,y:0,w:32,h:28},{x:66,y:0,w:32,h:28},{x:30,y:60,w:40,h:28}],
+   edges:[[0,3],[1,3],[2,3]]},
+ cycle:{nodes:[
+   {x:32,y:0,w:36,h:24},{x:66,y:30,w:32,h:28},{x:32,y:62,w:32,h:28},{x:2,y:30,w:32,h:28}],
+   edges:[[0,1],[1,2],[2,3],[3,0]]}
+};
+
 /* ================= 反模式速查 ================= */
 const ANTIPATTERNS=[
  {name:'对朋友倾诉用汇报结构',
-  bad:'先抛结论再列三点，对方会觉得你在做报告而不是在听他。',
+  bad:'先抛结论再列三点，对方会觉得你在做报告，没在听他。',
   fix:'先接住情绪，问一句"要不要我给建议"，再谈方法。'},
  {name:'对下属只给结论不给背景',
   bad:'只说"去做这个"，执行时一定会因为不知道为什么而变形。',
@@ -650,7 +706,7 @@ const FRAMEWORKS=[
    {t:'note',text:'判断有没有增量，用"对方知道吗"测试：他本来就知道的，删掉或一句带过。'}]},
  {id:'persuasion',name:'说服七原则',source:'西奥迪尼《影响力》',
   blocks:[
-   {t:'p',text:'它们不是话术，而是人做决定时的心理规律，也能帮你识别别人在对你用什么。'},
+   {t:'p',text:'它们属于人做决定时的心理规律，算不上话术，也能帮你识别别人在对你用什么。'},
    {t:'table',head:['原则','含义','正当用法'],rows:[
     ['互惠','人倾向于回报给予','先帮一个忙，再提要求'],
     ['承诺与一致','人要和自己说过的保持一致','让对方自己说出截止时间'],
@@ -671,7 +727,7 @@ const FRAMEWORKS=[
    {t:'note',text:'《关键对话》另有四个探索动作：询问、确认、复述、启发。'}]},
  {id:'humor',name:'幽默技巧与分寸',source:'Aaker & Bagdonas《Humor, Seriously》',
   blocks:[
-   {t:'p',text:'职场幽默的公式是 真相 + 意外，目的不是显得好笑，而是让人感觉更近。'},
+   {t:'p',text:'职场幽默的公式是 真相 + 意外，重点在让人感觉更近，单靠好笑不够。'},
    {t:'table',head:['技巧','怎么用'],rows:[
     ['从真相里挖','讲大家都经历过、但没人说出来的观察'],
     ['意外 / 反转','先建立预期，然后打破它'],
@@ -912,8 +968,11 @@ function renderA(){
   document.getElementById('scenecap').textContent=sc.cap;
   document.getElementById('sc-better').classList.toggle('sel',state.scene==='better');
   document.getElementById('sc-plain').classList.toggle('sel',state.scene==='plain');
-  document.getElementById('nodes').innerHTML=sc.steps.map((s,i)=>
-    `<div class="node"><small>0${i+1}</small><b>${s.name}</b></div>`).join('');
+  const geom=LAYOUTS[sc.layout||'linear'];
+  document.getElementById('nodes').innerHTML=sc.steps.map((s,i)=>{
+    const g=geom.nodes[i];
+    return `<div class="node" style="left:${g.x}%;top:${g.y}%;width:${g.w}%;height:${g.h}%"><small>0${i+1}</small><b>${s.name}</b></div>`;
+  }).join('');
   document.getElementById('tracebody').innerHTML=sc.steps.map((s,i)=>
     `<tr class="${i===state.step?'cur':''}" data-i="${i}"><td class="no">0${i+1}</td><td>${s.name}</td><td>${s.obs}</td></tr>`).join('');
   document.querySelectorAll('#tracebody tr').forEach(r=>r.onclick=()=>{
@@ -970,14 +1029,17 @@ function checkDrill(){
 
 /* ================= 画布连接线与圆点 ================= */
 function drawStage(){
-  const n=curLesson()[state.scene].steps.length;
-  const xs=Array.from({length:n},(_,i)=>12.5+i*(75/(n-1)));
+  const sc=curLesson()[state.scene];
+  const geom=LAYOUTS[sc.layout||'linear'];
+  const cen=geom.nodes.map(g=>({cx:g.x+g.w/2,cy:g.y+g.h/2}));
   let paths='';
-  for(let i=0;i<n-1;i++){
-    paths+=`<path class="flow-base" d="M${xs[i]},30 H${xs[i+1]}"/>`;
-    paths+=`<path class="flow-lit ${i<state.step?'on':''}" d="M${xs[i]},30 H${xs[i+1]}"/>`;
-  }
-  paths+=`<circle class="traveldot" r="2.6" cx="${xs[state.step]}" cy="30"/>`;
+  geom.edges.forEach(([a,b],i)=>{
+    const d=`M${cen[a].cx},${cen[a].cy} L${cen[b].cx},${cen[b].cy}`;
+    paths+=`<path class="flow-base" d="${d}"/>`;
+    paths+=`<path class="flow-lit ${i<state.step?'on':''}" d="${d}"/>`;
+  });
+  const cur=cen[state.step];
+  paths+=`<circle class="traveldot" r="2.6" cx="${cur.cx}" cy="${cur.cy}"/>`;
   document.getElementById('lines').innerHTML=paths;
 }
 function updateStep(){
@@ -1273,7 +1335,7 @@ function renderResult(text,perfect){
   const pyrHtml=`<div class="pyr"><div class="pconc">${esc(perfect.conclusion)}</div>
       <div class="ppoints">${perfect.points.map(p=>`<div class="ppoint"><b>${esc(p.title)}</b><span>${esc(p.evidence)}</span></div>`).join('')}</div></div>`;
   document.getElementById('result').innerHTML=`
-    <div class="checksummary">结构自查，不是写作评价。它只检查骨架，不判断你说得好不好。<br>
+    <div class="checksummary">结构自查只看骨架，不做写作评价，也不判断你说得好不好。<br>
       <b>8 项检查 · 通过 ${passCount} 项</b>（待改进项附可执行建议）</div>
     ${checksHtml}
     <div class="compare"><h3>逐句对照</h3>${cmpHtml}</div>
